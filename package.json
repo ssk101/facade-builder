@@ -1,0 +1,34 @@
+{
+  "name": "@steelskysoftware/facade-builder",
+  "version": "1.0.0",
+  "author": "steelskysoftware",
+  "license": "ISC",
+  "type": "module",
+  "description": "Build tool based on esbuild with support for various input and output formats. Optional file watcher for development builds, HMR, bundle splitting and more.",
+  "bugs": {
+    "url": "https://github.com/steelskysoftware/facade-builder/issues"
+  },
+  "homepage": "https://github.com/steelskysoftware/facade-builder#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@steelskysoftware"
+  },
+  "engines": {
+    "node": ">= 18.0.0"
+  },
+  "bin": {
+    "facade": "./bin/facade.js"
+  },
+  "dependencies": {
+    "@esbuild-plugins/node-modules-polyfill": "^0.1.1",
+    "chokidar": "^3.5.1",
+    "esbuild": "^0.12.7",
+    "esbuild-stylus-loader": "^0.2.1",
+    "flat": "^5.0.2",
+    "pug-lexer": "^5.0.1",
+    "pug-parser": "^6.0.0",
+    "source-map": "^0.7.3",
+    "stylus": "^0.54.8",
+    "virtual-dom": "^2.1.1",
+    "yargs": "^17.0.0"
+  }
+}

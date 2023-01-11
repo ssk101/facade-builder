@@ -1,0 +1,10 @@
+{
+  "experimentalDecorators": true,
+  "compilerOptions": {
+    "module": "esm",
+    "experimentalDecorators": true,
+    "noImplicitAny": true,
+    "removeComments": true,
+    "sourceMap": true
+  }
+}
