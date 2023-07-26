@@ -37,7 +37,7 @@ export async function watcherModule(buildResult, configuration) {
       `${CWD}/${outdir}`,
       `${CWD}/.git`,
       ...ignoreWatch.map(ignoredPath => {
-        return `${CWD}/ignoredPath`
+        return `${CWD}/${ignoredPath}`
       })
     ],
     followSymlinks,
