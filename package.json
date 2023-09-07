@@ -21,7 +21,7 @@
   "dependencies": {
     "@esbuild-plugins/node-modules-polyfill": "^0.1.1",
     "chokidar": "^3.5.1",
-    "esbuild": "^0.12.7",
+    "esbuild": "0.13.11",
     "esbuild-stylus-loader": "^0.2.1",
     "flat": "^5.0.2",
     "pug-lexer": "^5.0.1",

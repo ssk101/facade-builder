@@ -6,7 +6,7 @@ import { LOG_LEVELS } from '../constants/index.js'
 const CWD = process.cwd()
 
 export async function watcherModule(buildResult, configuration) {
-  function logChange({ filePath, message }, level = 3, kind) {
+  function logFileChange({ filePath, message }, level = 3, kind) {
     if(LOG_LEVELS.indexOf(configuration.logLevel) < level) return
 
     const method = LOG_LEVELS[level] || 'info'
@@ -45,16 +45,16 @@ export async function watcherModule(buildResult, configuration) {
 
   if(alsoWatchDirs.length) {
     for(const dir of alsoWatchDirs) {
-      const fqDir = path.join(CWD, dir)
+      const dirPath = path.join(CWD, dir)
 
       try {
-        const exists = fs.lstatSync(fqDir)
+        const exists = fs.lstatSync(dirPath)
 
         if(exists) {
-          for(const file of fs.readdirSync(fqDir)) {
-            const fqPath = path.join(fqDir, file)
-            logChange({ message: fqPath }, 3, 'manually added')
-            watcher.add(fqPath)
+          for(const file of fs.readdirSync(dirPath)) {
+            const filePath = path.join(dirPath, file)
+            logFileChange({ message: filePath }, 3, 'manually added')
+            watcher.add(filePath)
           }
         }
       } catch (e) {
@@ -65,30 +65,30 @@ export async function watcherModule(buildResult, configuration) {
 
   watcher
     .on('change', async(filePath) => {
-      logChange({ filePath }, 3, 'changed')
+      logFileChange({ filePath }, 3, 'changed')
 
       if(buildResult?.rebuild) {
         await buildResult.rebuild()
-        logChange({ message: 'rebuilt.' }, 3)
+        logFileChange({ message: 'rebuilt' }, 3)
       }
     })
     .on('add', async(filePath) => {
-      logChange({ filePath }, 4, 'added')
+      logFileChange({ filePath }, 4, 'added')
     })
     .on('unlink', (filePath) => {
-      logChange({ filePath }, 4, 'unlinked')
+      logFileChange({ filePath }, 4, 'unlinked')
     })
     .on('unlinkDir', (filePath) => {
-      logChange({ filePath }, 4, 'directory unlinked')
+      logFileChange({ filePath }, 4, 'directory unlinked')
     })
     .on('ready', () => {
-      logChange({ message: 'ready.' }, 3)
+      logFileChange({ message: 'ready' }, 3)
     })
     .on('raw', async(event, filePath, details) => {
-      logChange({ filePath, message: { event, details } }, 5)
+      logFileChange({ filePath, message: { event, details } }, 5)
     })
     .on('error', async(e) => {
-      logChange({ message: e }, 1)
+      logFileChange({ message: e }, 1)
     })
 
   return errors

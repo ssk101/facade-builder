@@ -59,6 +59,11 @@ const options = yargs(hideBin(process.argv))
       boolean: true,
       default: false,
     },
+    t: {
+      alias: 'treeShaking',
+      describe: 'Forcibly enable or disable tree shaking',
+      boolean: true,
+    },
     s: {
       alias: 'sourcemap',
       describe: 'Enable sourcemap',
@@ -137,6 +142,7 @@ setup({
   format: options.format,
   dist: options.dist,
   splitting: options.splitting,
+  treeShaking: options.treeShaking,
   sourcemap: options.sourcemap,
   minify: options.minify,
   pretty: options.pretty,
@@ -160,6 +166,7 @@ export default async function setup(opts) {
       const { pugPlugin } = await import('../plugins/pug.js')
       plugins.push(pugPlugin())
     }
+
     if(plugin === 'stylus') {
       const { stylusPlugin } = await import('../plugins/stylus.js')
       plugins.push(stylusPlugin())
@@ -178,6 +185,7 @@ export default async function setup(opts) {
         entryNames: opts.outfile,
         minify: opts.dist,
         splitting: opts.dist ? false : opts.splitting,
+        ...typeof treeShaking !== 'undefined' && { treeShaking: opts.treeShaking },
         incremental: opts.watch,
         loader: { '.js': 'ts' },
         absWorkingDir: CWD,
