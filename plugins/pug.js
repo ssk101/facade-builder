@@ -180,6 +180,35 @@ class Compiler {
     return this
   }
 
+  visitMixin(mixin, context) {
+    var node = `e$${this.uid++}`
+
+    this.buffer(`let ${node} = $$.create(${mixin.name})`)
+
+    const ATTRIBUTES = {}
+
+    var attributes = ''
+
+    if(mixin.attrs.length) {
+      for(let {name, val} of mixin.attrs) {
+        ATTRIBUTES[name] = val
+      }
+      attributes = objectString(ATTRIBUTES)
+    }
+
+    if(mixin.args) {
+      attributes += (attributes ? ',' : '' ) + mixin.args
+    }
+
+    if(mixin.block) this.visit(mixin.block, node)
+
+    if(attributes) {
+      return this.buffer(`$$.mixin(${context}, ${node}, ${attributes})`)
+    } else {
+      return this.buffer(`$$.mixin(${context}, ${node})`)
+    }
+  }
+
   visitAttributes(tag, context) {
     const { attrs, attributeBlocks } = tag
     const EVENTS = []

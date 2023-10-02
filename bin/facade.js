@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import esbuild from 'esbuild'
+import path from 'path'
+import * as esbuild from 'esbuild'
 import {
   NodeModulesPolyfillPlugin,
 } from '@esbuild-plugins/node-modules-polyfill'
@@ -88,16 +89,6 @@ const options = yargs(hideBin(process.argv))
       boolean: true,
       default: false,
     },
-    alsoWatchDirs: {
-      describe: 'Also watch these directories',
-      type: 'array',
-      default: [],
-    },
-    ignoreWatch: {
-      describe: 'Do not watch these files/paths',
-      type: 'array',
-      default: [],
-    },
     l: {
       alias: 'logLevel',
       describe: 'Set log level verbosity',
@@ -110,11 +101,6 @@ const options = yargs(hideBin(process.argv))
       type: 'array',
       choices: ['pug', 'stylus'],
       default: ['pug', 'stylus'],
-    },
-    followSymlinks: {
-      describe: 'Also watch symlinked directories and files',
-      boolean: true,
-      default: false,
     },
     keepNames: {
       describe: `Don't let terser mangle function and class names`,
@@ -147,11 +133,8 @@ setup({
   minify: options.minify,
   pretty: options.pretty,
   watch: options.watch,
-  alsoWatchDirs: options.alsoWatchDirs,
-  ignoreWatch: options.ignoreWatch,
   logLevel: options.logLevel,
   plugins: options.plugins,
-  followSymlinks: options.followSymlinks,
   keepNames: options.keepNames,
   define: { global: 'window' },
 })
@@ -173,8 +156,13 @@ export default async function setup(opts) {
     }
   }
 
-  const buildResult = await build(
-    Object.assign(
+  try {
+    if(opts.outfile && opts.outdir) {
+      opts.outfile = path.join(opts.outdir, path.basename(opts.outfile))
+      delete opts.outdir
+    }
+
+    const buildOpts = Object.assign(
       Object.keys(opts).reduce((acc, key) => {
         if(VALID_BUILD_OPTIONS.indexOf(key) !== -1) {
           acc[key] = opts[key]
@@ -182,11 +170,11 @@ export default async function setup(opts) {
         return acc
       }, {}),
       {
-        entryNames: opts.outfile,
+        ...opts.outfile && { outfile: opts.outfile },
+        ...(!opts.outfile && opts.outdir) && { outdir: opts.outdir },
         minify: opts.dist,
         splitting: opts.dist ? false : opts.splitting,
         ...typeof treeShaking !== 'undefined' && { treeShaking: opts.treeShaking },
-        incremental: opts.watch,
         loader: { '.js': 'ts' },
         absWorkingDir: CWD,
         keepNames: opts.keepNames,
@@ -194,31 +182,14 @@ export default async function setup(opts) {
         plugins,
       }
     )
-  )
 
-  if(opts.watch) {
-    const { watcherModule } = await import('../modules/watcher.js')
-    const watcherErrors = await watcherModule(buildResult, {
-      ...opts,
-      alsoWatchDirs: !ERRORS.alsoWatchDirs ? opts.alsoWatchDirs : [],
-    })
-
-    for(const [kind, error] of watcherErrors) {
-      ERRORS[kind] = error
+    if(opts.watch) {
+      const ctx = await esbuild.context(buildOpts)
+      await ctx.watch()
+    } else {
+      await esbuild.build(opts)
     }
-
-  }
-}
-
-async function build(opts) {
-  let buildResult
-
-  try {
-    buildResult = await esbuild.build(opts)
-    console.info('Built', opts)
   } catch (e) {
     console.error(e)
   }
-
-  return buildResult
 }
