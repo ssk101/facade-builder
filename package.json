@@ -1,16 +1,16 @@
 {
-  "name": "@steelskysoftware/facade-builder",
+  "name": "@ssk101/facade-builder",
   "version": "1.1.1",
-  "author": "steelskysoftware",
+  "author": "ssk101",
   "license": "ISC",
   "type": "module",
   "description": "Build tool based on esbuild with support for various input and output formats. Optional file watcher for development builds, HMR, bundle splitting and more.",
   "bugs": {
-    "url": "https://github.com/steelskysoftware/facade-builder/issues"
+    "url": "https://github.com/ssk101/facade-builder/issues"
   },
-  "homepage": "https://github.com/steelskysoftware/facade-builder#readme",
+  "homepage": "https://github.com/ssk101/facade-builder#readme",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/@steelskysoftware"
+    "registry": "https://npm.pkg.github.com/@ssk101"
   },
   "engines": {
     "node": ">= 18.0.0"
